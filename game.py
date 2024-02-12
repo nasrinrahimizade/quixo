@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from copy import deepcopy
 from enum import Enum
 import numpy as np
@@ -44,15 +45,31 @@ class Game(object):
         '''
         return deepcopy(self._board)
 
+
     def get_current_player(self) -> int:
         '''
         Returns the current player
         '''
         return deepcopy(self.current_player_idx)
-
+    
+    """
     def print(self):
         '''Prints the board. -1 are neutral pieces, 0 are pieces of player 0, 1 pieces of player 1'''
         print(self._board)
+    """
+    def print(self):
+        '''Prints the board in a more readable format.'''
+        # Create a mapping from internal representation to display characters
+        display_mapping = {-1: ' ', 0: 'O', 1: 'X'}
+        
+        # Construct and print the board row by row
+        for row in self._board:
+            display_row = [display_mapping[cell] for cell in row]
+            print('|' + '|'.join(display_row) + '|')
+        
+        # Optionally, print a separator for readability
+        print('-' * (2 * len(self._board[0]) + 1))
+    
 
     def check_winner(self) -> int:
         '''Check the winner. Returns the player ID of the winner if any, otherwise returns -1'''
@@ -83,28 +100,69 @@ class Game(object):
             # return the relative id
             return self._board[0, -1]
         return -1
+    
+    
+    def my_make_move(self, current_board, possible_move , current_player_idx):
+        from_pos, slide = possible_move
+        original_board = deepcopy(self._board)
+
+        self._board = current_board
+
+        #print ('from this current move i do my_make_move',current_board)
+
+        result_board = None
+
+        ok = self.__move(from_pos, slide, current_player_idx)
+
+        if ok:
+            #print('my_make_move works')
+            result_board = deepcopy(self._board)
+            #print ('result_board is \n', result_board)
+        else:
+            #print('error in my_make_move\n')
+            pass
+
+        self._board = deepcopy(original_board)
+        return result_board
+    
 
     def play(self, player1: Player, player2: Player) -> int:
         '''Play the game. Returns the winning player'''
         players = [player1, player2]
         winner = -1
+        move_count = 0  # Keep track of moves
         while winner < 0:
             self.current_player_idx += 1
             self.current_player_idx %= len(players)
             ok = False
             while not ok:
-                from_pos, slide = players[self.current_player_idx].make_move(
-                    self)
+                print(f"Player {self.current_player_idx}'s turn:")  # Indicate whose turn it is
+                from_pos, slide = players[self.current_player_idx].make_move(self)
+                print(from_pos)
+                print(slide)
                 ok = self.__move(from_pos, slide, self.current_player_idx)
+                if ok:
+                    move_count += 1
+                    self.print()  # Print the board after each successful move
+                    #count_pause= input("enter a number:")
+                else:
+                    print("Invalid move, trying again...")
             winner = self.check_winner()
+        
+        if winner != -1:
+            print(f"Game Over. Winner: Player {winner}")
+        
         return winner
-
+    
+    
+    
     def __move(self, from_pos: tuple[int, int], slide: Move, player_id: int) -> bool:
         '''Perform a move'''
         if player_id > 2:
             return False
         # Oh God, Numpy arrays
         prev_value = deepcopy(self._board[(from_pos[1], from_pos[0])])
+        
         acceptable = self.__take((from_pos[1], from_pos[0]), player_id)
         if acceptable:
             acceptable = self.__slide((from_pos[1], from_pos[0]), slide)
