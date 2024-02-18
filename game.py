@@ -136,22 +136,23 @@ class Game(object):
             self.current_player_idx %= len(players)
             ok = False
             while not ok:
-                print(f"Player {self.current_player_idx}'s turn:")  # Indicate whose turn it is
+                #print(f"Player {self.current_player_idx}'s turn:")  # Indicate whose turn it is
                 from_pos, slide = players[self.current_player_idx].make_move(self)
-                print(from_pos)
-                print(slide)
+                #print(from_pos)
+                #print(slide)
                 ok = self.__move(from_pos, slide, self.current_player_idx)
                 if ok:
                     move_count += 1
-                    self.print()  # Print the board after each successful move
+                    #self.print()  # Print the board after each successful move
                     #count_pause= input("enter a number:")
                 else:
-                    print("Invalid move, trying again...")
+                    #print("Invalid move, trying again...")
+                    pass
             winner = self.check_winner()
         
         if winner != -1:
             print(f"Game Over. Winner: Player {winner}")
-        
+            self.print()
         return winner
     
     
