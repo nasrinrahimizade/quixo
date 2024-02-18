@@ -6,6 +6,7 @@ class RandomPlayer(Player):
         super().__init__()
 
     def make_move(self, game: 'Game') -> tuple[tuple[int, int], Move]:
+        game.print()
         from_pos = (random.randint(0, 4), random.randint(0, 4))
         move = random.choice([Move.TOP, Move.BOTTOM, Move.LEFT, Move.RIGHT])
         #print('frompos random player', from_pos)
@@ -20,7 +21,7 @@ class InteractivePlayer(Player):
         self.move_options = {"right": Move.RIGHT, "left": Move.LEFT, "up": Move.TOP, "down": Move.BOTTOM}
 
     def make_move(self, game: 'Game') -> tuple[tuple[int, int], Move]:
-        
+        game.print()
         move_valid = False
         while not move_valid:
             move_valid, selected_move = self.__get_move(game)
@@ -33,11 +34,11 @@ class InteractivePlayer(Player):
         move_valid, move_chosen = False, None
         try:
             x_coord = int(input('Select X coordinate (0-4): '))
-            if not 0 <= x_coord < 4:
+            if not 0 <= x_coord <= 4:
                 print('Please enter a valid X coordinate between 0 and 4.')
                 return False, None
             y_coord = int(input('Select Y coordinate (0-4): '))
-            if not 0 <= y_coord < 4:
+            if not 0 <= y_coord <= 4:
                 print('Please enter a valid Y coordinate between 0 and 4.')
                 return False, None
             direction_input = input('Enter direction (right, left, up, down): ')
